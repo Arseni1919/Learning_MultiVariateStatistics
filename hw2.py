@@ -94,6 +94,39 @@ def q_1():
 
 def q_2_seif_gimel():
     print('=========== Q2 - SEIF GIMEL ===========')
+    N = 1000
+    gamma = 2
+    z_1 = np.random.exponential(scale=gamma, size=N)
+    z_2 = np.random.exponential(scale=gamma, size=N)
+    z_3 = np.random.exponential(scale=1, size=N)
+
+    x_1 = np.sqrt(z_1/(z_1 + z_2 + z_3))
+    y_1 = np.sqrt(z_2/(z_1 + z_2 + z_3))
+
+    gamma = 4
+    z_1 = np.random.exponential(scale=gamma, size=N)
+    z_2 = np.random.exponential(scale=gamma, size=N)
+    z_3 = np.random.exponential(scale=1, size=N)
+
+    x_2 = np.sqrt(z_1 / (z_1 + z_2 + z_3))
+    y_2 = np.sqrt(z_2 / (z_1 + z_2 + z_3))
+
+    wrong_to_group_1 = 0
+    wrong_to_group_2 = 0
+    for i in range(N):
+        if y_1[i] > (1/x_1[i]) * np.sqrt(1/12):
+            wrong_to_group_2 += 1
+        if y_2[i] < (1/x_2[i]) * np.sqrt(1/12):
+            wrong_to_group_1 += 1
+
+    print(f'Probability to assign to group 2 while it is 1: {wrong_to_group_2/N}')
+    print(f'Probability to assign to group 1 while it is 2: {wrong_to_group_1/N}')
+
+    """
+    OUTPUT EXAMPLE:
+    Probability to assign to group 2 while it is 1: 0.586
+    Probability to assign to group 1 while it is 2: 0.31
+    """
 
 
 def main():
@@ -107,7 +140,8 @@ def main():
 
 if __name__ == '__main__':
     seed = 12
-    to_use_seed = True
+    # to_use_seed = True
+    to_use_seed = False
     random.seed(seed)
     np.random.seed(seed)
 
