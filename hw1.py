@@ -173,6 +173,7 @@ def q3_seif_gimel():
     print(f'[Q3 - gimel] - The power is: {power}')
     print('=========== ========== ===========')
 
+
 def main():
     # Q1
     """
