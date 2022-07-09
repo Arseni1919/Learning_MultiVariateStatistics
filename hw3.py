@@ -34,7 +34,7 @@ def q1_PCA_func():
         h_squared = np.sum(np.power(Lambda, 2), 0)
 
         # Print
-        if i > N_iterations - 3:
+        if i >= N_iterations - 3:
             print('----')
             print(f'eigen_val_1: {eigen_val_1}')
             print(f'eigen_vector_1: {eigen_vector_1}')
@@ -80,7 +80,7 @@ def q1_MLE_func():
         pass
 
         # Print
-        if i > N_iterations - 3:
+        if i >= N_iterations - 3:
             print('----')
             # print(f'eigen_val_1: {eigen_val_1}')
             # print(f'eigen_vector_1: {eigen_vector_1}')
@@ -92,7 +92,7 @@ def q1_MLE_func():
     """
 
 
-def q2_func():
+def q2_EM_func():
     print('=========== ========== ===========')
     print('=========== ========== ===========')
     print('=========== ========== ===========')
@@ -123,7 +123,7 @@ def q2_func():
         lambda_1 = (data_N - sum(y_data)) / (sum(y_data * (1 - I_star_list)))
 
         # Print
-        if i > N_iterations - 3:
+        if i >= N_iterations - 3:
             print(f'[{i + 1}]: alpha: {alpha : .4f}, lambda 0: {lambda_0 : .4f}, lambda 1: {lambda_1 : .4f}')
 
         alpha_list.append(alpha)
@@ -146,7 +146,7 @@ def q2_func():
 def main():
     q1_PCA_func()
     q1_MLE_func()
-    q2_func()
+    q2_EM_func()
 
 
 if __name__ == '__main__':
