@@ -8,9 +8,9 @@ from scipy.optimize import minimize
 
 def q1_PCA_func():
     print('=========== ========== ===========')
+    print('=========== q1_PCA_func ===========')
     print('=========== ========== ===========')
-    print('=========== ========== ===========')
-    N_iterations = 100
+    N_iterations = 500
     A = np.array(
         [
             [1, .2, .4, .36],
@@ -83,7 +83,7 @@ def log_likelihood_func_fixed_lambda(psi_values, *args):
 
 def q1_MLE_func():
     print('=========== ========== ===========')
-    print('=========== ========== ===========')
+    print('=========== q1_MLE_func ===========')
     print('=========== ========== ===========')
     N_iterations = 1000
     A = np.array(
@@ -98,19 +98,21 @@ def q1_MLE_func():
     h_squared = np.max(A - np.identity(4), axis=1)
     next_psi = 1 - h_squared
     next_lambdas = np.array([.1, .1, .1, .1])
+    method = 'BFGS'
 
     for i in range(N_iterations):
         # maximise on lambdas
         res_lambdas = minimize(log_likelihood_func_fixed_psi, next_lambdas,
-                               args=(next_psi[0], next_psi[1], next_psi[2], next_psi[3], A)
+                               args=(next_psi[0], next_psi[1], next_psi[2], next_psi[3], A),
+                               method=method
                                )
+        next_lambdas = res_lambdas.x
 
         # maximise on psi values
         res_psi = minimize(log_likelihood_func_fixed_lambda, next_psi,
-                           args=(next_lambdas[0], next_lambdas[1], next_lambdas[2], next_lambdas[3], A)
+                           args=(next_lambdas[0], next_lambdas[1], next_lambdas[2], next_lambdas[3], A),
+                           method=method
                            )
-
-        next_lambdas = res_lambdas.x
         next_psi = res_psi.x
 
         # Print
@@ -122,17 +124,17 @@ def q1_MLE_func():
     """
     Last two iterations:
     ----
-    next_lambdas: [-6.68241008e-08 -1.35547014e-07 -2.79758013e-01 -1.17349524e-07], fun: ( 400.0)
-    next_psi: [0.99999996 0.99999996 0.99689561 0.99999994], fun: ( 400.0)
+    next_lambdas: [ 3.36453253e-08 -2.70845791e-08 -2.79735128e-01 -1.86982201e-07], fun: ( 400.0)
+    next_psi: [1.00000001 0.99999998 0.92174825 0.99999997], fun: ( 400.0)
     ----
-    next_lambdas: [-6.68241008e-08 -5.15212564e-07 -5.57112734e-02  1.65632606e-06], fun: ( 400.0)
-    next_psi: [1.00000002 1.00000007 0.92173546 0.99999989], fun: ( 400.0)
+    next_lambdas: [ 3.36453253e-08 -2.70845791e-08 -2.79735128e-01 -1.86982201e-07], fun: ( 400.0)
+    next_psi: [1.00000001 0.99999998 0.92174825 0.99999997], fun: ( 400.0)
     """
 
 
 def q2_EM_func():
     print('=========== ========== ===========')
-    print('=========== ========== ===========')
+    print('=========== q2_EM_func ===========')
     print('=========== ========== ===========')
     N_iterations = 100
     alpha_list = []
@@ -183,9 +185,9 @@ def q2_EM_func():
 
 
 def main():
-    # q1_PCA_func()
+    q1_PCA_func()
     q1_MLE_func()
-    # q2_EM_func()
+    q2_EM_func()
 
 
 if __name__ == '__main__':
