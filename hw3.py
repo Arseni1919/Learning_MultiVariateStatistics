@@ -3,6 +3,7 @@ import random
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+from scipy.optimize import minimize
 
 
 def q1_PCA_func():
@@ -34,7 +35,7 @@ def q1_PCA_func():
         h_squared = np.sum(np.power(Lambda, 2), 0)
 
         # Print
-        if i >= N_iterations - 3:
+        if i >= N_iterations - PRINT_LAST_K:
             print('----')
             print(f'eigen_val_1: {eigen_val_1}')
             print(f'eigen_vector_1: {eigen_vector_1}')
@@ -61,11 +62,30 @@ def q1_PCA_func():
     """
 
 
+def log_likelihood_func_fixed_psi(lambdas, *args):
+    multiplied_lambdas_matrix = np.array([lambdas]) * np.array([lambdas]).T
+    psi_matrix = np.diag([args[0], args[1], args[2], args[3]])
+    sigma_matrix = multiplied_lambdas_matrix + psi_matrix
+    # to minimize we use + and not -
+    func_value = 100 * (np.log(np.linalg.det(sigma_matrix)) + np.trace(np.linalg.inv(sigma_matrix) * args[4]))
+    return func_value
+
+
+def log_likelihood_func_fixed_lambda(psi_values, *args):
+    lambdas = [args[0], args[1], args[2], args[3]]
+    multiplied_lambdas_matrix = np.array([lambdas]) * np.array([lambdas]).T
+    psi_matrix = np.diag(psi_values)
+    sigma_matrix = multiplied_lambdas_matrix + psi_matrix
+    # to minimize we use + and not -
+    func_value = 100 * (np.log(np.linalg.det(sigma_matrix)) + np.trace(np.linalg.inv(sigma_matrix) * args[4]))
+    return func_value
+
+
 def q1_MLE_func():
     print('=========== ========== ===========')
     print('=========== ========== ===========')
     print('=========== ========== ===========')
-    N_iterations = 100
+    N_iterations = 1000
     A = np.array(
         [
             [1, .2, .4, .36],
@@ -76,19 +96,37 @@ def q1_MLE_func():
     )
 
     h_squared = np.max(A - np.identity(4), axis=1)
+    next_psi = 1 - h_squared
+    next_lambdas = np.array([.1, .1, .1, .1])
+
     for i in range(N_iterations):
-        pass
+        # maximise on lambdas
+        res_lambdas = minimize(log_likelihood_func_fixed_psi, next_lambdas,
+                               args=(next_psi[0], next_psi[1], next_psi[2], next_psi[3], A)
+                               )
+
+        # maximise on psi values
+        res_psi = minimize(log_likelihood_func_fixed_lambda, next_psi,
+                           args=(next_lambdas[0], next_lambdas[1], next_lambdas[2], next_lambdas[3], A)
+                           )
+
+        next_lambdas = res_lambdas.x
+        next_psi = res_psi.x
 
         # Print
-        if i >= N_iterations - 3:
+        if i >= N_iterations - PRINT_LAST_K:
             print('----')
-            # print(f'eigen_val_1: {eigen_val_1}')
-            # print(f'eigen_vector_1: {eigen_vector_1}')
-            # print(f'Lambda: {Lambda}')
-            # print(f'Psi: {Psi}')
+            print(f'next_lambdas: {next_lambdas}, fun: ({res_lambdas.fun : .1f})')
+            print(f'next_psi: {next_psi}, fun: ({res_psi.fun : .1f})')
+
     """
     Last two iterations:
-
+    ----
+    next_lambdas: [-6.68241008e-08 -1.35547014e-07 -2.79758013e-01 -1.17349524e-07], fun: ( 400.0)
+    next_psi: [0.99999996 0.99999996 0.99689561 0.99999994], fun: ( 400.0)
+    ----
+    next_lambdas: [-6.68241008e-08 -5.15212564e-07 -5.57112734e-02  1.65632606e-06], fun: ( 400.0)
+    next_psi: [1.00000002 1.00000007 0.92173546 0.99999989], fun: ( 400.0)
     """
 
 
@@ -113,7 +151,8 @@ def q2_EM_func():
         # E step
         I_star_list = []
         for y_i in y_data:
-            I_star_i = (alpha*lambda_1 * np.exp(-lambda_1 * y_i))/(alpha*lambda_1 * np.exp(-lambda_1 * y_i) + (1-alpha) * lambda_0 * np.exp(-lambda_0*y_i))
+            I_star_i = (alpha * lambda_1 * np.exp(-lambda_1 * y_i)) / (
+                    alpha * lambda_1 * np.exp(-lambda_1 * y_i) + (1 - alpha) * lambda_0 * np.exp(-lambda_0 * y_i))
             I_star_list.append(I_star_i)
         I_star_list = np.array(I_star_list)
 
@@ -123,7 +162,7 @@ def q2_EM_func():
         lambda_1 = (data_N - sum(y_data)) / (sum(y_data * (1 - I_star_list)))
 
         # Print
-        if i >= N_iterations - 3:
+        if i >= N_iterations - PRINT_LAST_K:
             print(f'[{i + 1}]: alpha: {alpha : .4f}, lambda 0: {lambda_0 : .4f}, lambda 1: {lambda_1 : .4f}')
 
         alpha_list.append(alpha)
@@ -144,10 +183,11 @@ def q2_EM_func():
 
 
 def main():
-    q1_PCA_func()
+    # q1_PCA_func()
     q1_MLE_func()
-    q2_EM_func()
+    # q2_EM_func()
 
 
 if __name__ == '__main__':
+    PRINT_LAST_K = 3
     main()
